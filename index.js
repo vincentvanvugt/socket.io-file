@@ -15,6 +15,7 @@ function SocketIOFile(socket, options) {
 	this.options = options || {};
 	this.maxFileSize = +options.maxFileSize || undefined;
 	this.accepts = options.accepts || [];
+	this.acceptFunc = options.acceptFunc || undefined;
 	this.chunkSize = +options.chunkSize || 10240;
 	this.transmissionDelay = options.transmissionDelay || 0;
 	this.overwrite = !!options.overwrite || false;
@@ -73,6 +74,13 @@ function SocketIOFile(socket, options) {
 			});
 		}
 
+
+		if(this.acceptFunc && typeof this.acceptFunc === 'function') {
+			if(!this.acceptFunc(fileInfo)) {
+				return sendError(new Error('Upload was not accepted.'));
+			}
+		}
+	
 
 		if(this.rename) {
 			if(typeof this.rename === 'function') {
